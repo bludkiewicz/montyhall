@@ -12,7 +12,6 @@
     <artifactId>montyhall</artifactId>
     <version>1.0</version>
     <name>montyhall</name>
-    <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>11</java.version>
@@ -42,6 +41,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
