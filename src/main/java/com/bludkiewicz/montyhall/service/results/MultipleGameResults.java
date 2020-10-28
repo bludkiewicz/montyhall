@@ -1,6 +1,5 @@
 package com.bludkiewicz.montyhall.service.results;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -8,41 +7,25 @@ import java.util.List;
  */
 public class MultipleGameResults {
 
-	// using a linked list to avoid ArrayList resizing
-	private final List<SingleGameResult> results = new LinkedList<>();
-	private int wins;
-	private int attempts;
+	private final int wins;
+	private final int attempts;
+	private final List<SingleGameResult> results;
 
-	public MultipleGameResults() {
+	public MultipleGameResults(int wins, int attempts, List<SingleGameResult> results) {
+		this.wins = wins;
+		this.attempts = attempts;
+		this.results = results;
 	}
 
-	public void addResult(SingleGameResult result) {
-
-		results.add(result);
-
-		attempts++;
-		if (result.isWinner()) wins++;
-	}
-
-	public List<SingleGameResult> getSingleResults() {
-
-		return results;
+	public int getWins() {
+		return wins;
 	}
 
 	public int getAttempts() {
-
 		return attempts;
 	}
 
-	public double getWinPercentage() {
-		return ((double) wins / attempts) * 100;
-	}
-
-	@Override
-	public String toString() {
-		return "MultipleGameResults{" +
-				"iterations=" + results.size() +
-				", Win Percentage=" + getWinPercentage() +
-				'}';
+	public List<SingleGameResult> getSingleResults() {
+		return results;
 	}
 }

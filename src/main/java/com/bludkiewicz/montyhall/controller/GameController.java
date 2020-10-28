@@ -1,7 +1,10 @@
 package com.bludkiewicz.montyhall.controller;
 
 import com.bludkiewicz.montyhall.controller.json.GameParams;
+import com.bludkiewicz.montyhall.controller.json.Response;
 import com.bludkiewicz.montyhall.service.GameService;
+import com.bludkiewicz.montyhall.service.ResponseService;
+import com.bludkiewicz.montyhall.service.params.GameOptions;
 import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +20,12 @@ public class GameController {
 
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 
-	private GameService service;
+	private final GameService gameService;
+	private final ResponseService responseService;
 
-	public GameController(GameService service) {
-		this.service = service;
+	public GameController(GameService gameService, ResponseService responseService) {
+		this.gameService = gameService;
+		this.responseService = responseService;
 	}
 
 	/**
@@ -31,12 +36,12 @@ public class GameController {
 	 * but I do not know of a way to map both @PathVariables and @JsonProperties to the same class.
 	 */
 	@GetMapping("/api/play/{iterations}/{switch}")
-	public void play(@Valid @Positive @PathVariable Integer iterations,
-					 @PathVariable("switch") Boolean switchDoor) {
+	public Response play(@Valid @Positive @PathVariable Integer iterations,
+						 @PathVariable("switch") Boolean switchDoors) {
 
-		log.debug("PathVariables Received: {}, {}", iterations, switchDoor);
+		log.debug("PathVariables Received: {}, {}", iterations, switchDoors);
 
-		MultipleGameResults results = service.simulate(iterations, switchDoor);
+		return playTheGame(iterations, switchDoors);
 	}
 
 	/**
@@ -44,10 +49,20 @@ public class GameController {
 	 * Parameters are validated and violations are handled in ControllerExceptionHandler.
 	 */
 	@PostMapping("/api/play/")
-	public void play(@Valid @RequestBody GameParams params) {
+	public Response play(@Valid @RequestBody GameParams params) {
 
 		log.debug("RequestBody Received: {}", params);
 
-		play(params.getIterations(), params.getSwitchDoor());
+		return playTheGame(params.getIterations(), params.getSwitchDoor());
+	}
+
+	/**
+	 * No matter how the request is received, the game is played the same.
+	 */
+	private Response playTheGame(int iterations, boolean switchDoors) {
+		MultipleGameResults results =
+				gameService.simulate(iterations, new GameOptions(switchDoors));
+
+		return responseService.processResults(results);
 	}
 }

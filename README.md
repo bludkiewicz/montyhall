@@ -20,3 +20,19 @@ POST /api/play/<br>
 { "iterations": $(iterations), "switch": $(switch) }
 
 Please note both endpoints run on port 8080 by default.
+
+The output will be logged on info.
+
+As there can be Integer.MAX_VALUE iterations, you may not want to show individual results after a certain threshold.
+That can be set in application.properties as output.max_results_to_show.  If not set it will default to 1000.
+
+To create an executable jar:
+`mvn package`
+
+To run the application:
+`java -jar montyhall.jar`
+
+JaCoCo is used to verify test code coverage.
+
+This application logs the output, and it uses emojis to show results.
+Please be aware that your runtime environment will need emoji support to display properly.

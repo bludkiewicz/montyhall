@@ -1,9 +1,12 @@
 package com.bludkiewicz.montyhall.service;
 
+import com.bludkiewicz.montyhall.service.components.ComponentFactory;
+import com.bludkiewicz.montyhall.service.components.GameDoors;
+import com.bludkiewicz.montyhall.service.params.GameOptions;
+import com.bludkiewicz.montyhall.service.components.ResultsTracker;
 import com.bludkiewicz.montyhall.service.enums.Door;
 import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
 import com.bludkiewicz.montyhall.service.results.SingleGameResult;
-import com.bludkiewicz.montyhall.service.state.GameDoors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,44 +21,50 @@ public class GameService {
 
 	private static final Logger log = LoggerFactory.getLogger(GameService.class);
 
+	private final ComponentFactory components;
+
+	public GameService(ComponentFactory components) {
+		this.components = components;
+	}
+
 	/**
 	 * Simulates multiple games.
 	 */
-	public MultipleGameResults simulate(int iterations, boolean switchDoor) {
+	public MultipleGameResults simulate(int iterations, GameOptions options) {
 
-		log.info("Simulating {} games {} switching doors", iterations, (switchDoor ? "while" : "without"));
+		log.info("Simulating {} games {} switching doors", iterations, (options.isSwitchDoors() ? "while" : "without"));
 
-		MultipleGameResults results = new MultipleGameResults();
+		ResultsTracker tracker = components.getResultsTracker();
 		for (int i = 1; i <= iterations; i++) {
 
 			log.debug("Game number: {}", i);
-
-			SingleGameResult result = simulate(switchDoor);
-			results.addResult(result);
+			tracker.addResult(simulate(options));
 		}
 
-		log.debug("Final results: {}", results);
+		MultipleGameResults results = tracker.getMultipleGameResults();
+		log.debug("Overall results: {}", results);
+
 		return results;
 	}
 
 	/**
 	 * Simulates a single game.
 	 */
-	private SingleGameResult simulate(boolean switchDoor) {
+	private SingleGameResult simulate(GameOptions options) {
 
-		GameDoors game = new GameDoors();
-		List<Door> allDoors = game.getPossibleDoorOptions();
+		GameDoors game = components.getGameDoors();
 
 		// pick a door, any door...
+		List<Door> allDoors = game.getPossibleDoorOptions();
 		int index = new Random().nextInt(allDoors.size());
 		Door originalDoor = allDoors.get(index);
 		log.debug("Original door: {}", originalDoor);
 
 		Door selectedDoor;
-		if (!switchDoor) {
+		if (!options.isSwitchDoors()) {
 
 			// if we are not switching doors
-			// then the rest of the game always plays out the same in the end
+			// then the end result will always be the same
 			// no need to run through unnecessary processing
 			selectedDoor = originalDoor;
 
@@ -66,12 +75,12 @@ public class GameService {
 			log.debug("Opened door: {}", openedDoor);
 
 			// remove the original door and the opened door from possible options
-			Set<Door> options = new HashSet<>(allDoors);
-			options.remove(originalDoor);
-			options.remove(openedDoor);
+			Set<Door> doorOptions = new HashSet<>(allDoors);
+			doorOptions.remove(originalDoor);
+			doorOptions.remove(openedDoor);
 
 			// there should only be one door left, which we select
-			selectedDoor = options.iterator().next();
+			selectedDoor = doorOptions.iterator().next();
 		}
 
 		log.debug("Selected door: {}", selectedDoor);

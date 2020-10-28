@@ -48,14 +48,4 @@ public class SingleGameResult {
 	public boolean isWinner() {
 		return (selectedDoor == doorWithCar);
 	}
-
-	@Override
-	public String toString() {
-		return "SingleGameResult{" +
-				"doorWithCar=" + doorWithCar +
-				", original=" + originalDoor +
-				", selected=" + selectedDoor +
-				", isWinner=" + isWinner() +
-				'}';
-	}
 }

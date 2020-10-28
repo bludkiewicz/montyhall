@@ -10,10 +10,6 @@ public enum Door {
 		this.value = value;
 	}
 
-	public Integer getValue() {
-		return value;
-	}
-
 	@Override
 	public String toString() {
 		return value.toString();

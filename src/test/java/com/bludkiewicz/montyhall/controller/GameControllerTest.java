@@ -1,7 +1,9 @@
 package com.bludkiewicz.montyhall.controller;
 
-import com.bludkiewicz.montyhall.controller.exception.ControllerExceptionHandler;
 import com.bludkiewicz.montyhall.service.GameService;
+import com.bludkiewicz.montyhall.service.ResponseService;
+import com.bludkiewicz.montyhall.service.params.GameOptions;
+import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -31,14 +31,18 @@ public class GameControllerTest {
 	private MockMvc mockMvc;
 
 	@MockBean
-	private GameService mock;
+	private GameService gameMock;
+
+	@MockBean
+	private ResponseService responseMock;
 
 	@BeforeEach
 	public void setupMock() {
 
 		// this method may or may not be called
 		// depending on whether validation may or may not have passed
-		lenient().when(mock.simulate(anyInt(), anyBoolean())).thenReturn(null);
+		lenient().when(gameMock.simulate(anyInt(), any())).thenReturn(results);
+		lenient().when(responseMock.processResults(results)).thenReturn(null);
 	}
 
 	//
@@ -51,7 +55,7 @@ public class GameControllerTest {
 		// get is not allowed with json content
 		mockMvc.perform(get("/api/play/").contentType(MediaType.APPLICATION_JSON).content("{}"))
 				.andExpect(status().isMethodNotAllowed())
-				.andExpect(content().string(startsWith(ControllerExceptionHandler.MESSAGE_PREFIX)));
+				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 
@@ -68,7 +72,7 @@ public class GameControllerTest {
 		// post is not allowed with path variables
 		mockMvc.perform(post("/api/play/1/true"))
 				.andExpect(status().isMethodNotAllowed())
-				.andExpect(content().string(startsWith(ControllerExceptionHandler.MESSAGE_PREFIX)));
+				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 
@@ -130,14 +134,16 @@ public class GameControllerTest {
 				.andExpect(status().isOk());
 
 		// verifies that service received correct parameters
-		verify(mock, times(1)).simulate(1000, false);
+		verify(gameMock, times(1)).simulate(1000, new GameOptions(false));
+		verify(responseMock, times(1)).processResults(results);
 
 		// test post request with json content
 		postWithJSON("1", "true")
 				.andExpect(status().isOk());
 
 		// verifies that service received correct parameters
-		verify(mock, times(1)).simulate(1, true);
+		verify(gameMock, times(1)).simulate(1, new GameOptions(true));
+		verify(responseMock, times(2)).processResults(results);
 	}
 
 	//
@@ -149,22 +155,23 @@ public class GameControllerTest {
 		// test get request with path variables
 		getWithPathVariables(iterations, switchDoor)
 				.andExpect(status().isBadRequest())
-				.andExpect(content().string(startsWith(ControllerExceptionHandler.MESSAGE_PREFIX)));
+				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 
 		// test post request with json content
 		postWithJSON(iterations, switchDoor)
 				.andExpect(status().isBadRequest())
-				.andExpect(content().string(startsWith(ControllerExceptionHandler.MESSAGE_PREFIX)));
+				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 	}
 
-	private void verifyMocks(int simulateMultiple) {
+	private void verifyMocks(int simulate) {
 
 		// verify validation worked
-		verify(mock, times(simulateMultiple)).simulate(anyInt(), anyBoolean());
+		verify(gameMock, times(simulate)).simulate(anyInt(), any());
+		verify(responseMock, times(simulate)).processResults(any());
 	}
 
 	private ResultActions getWithPathVariables(String iterations, String switchDoor) throws Exception {
@@ -184,4 +191,10 @@ public class GameControllerTest {
 		// perform post request with json content
 		return mockMvc.perform(post("/api/play/").contentType(MediaType.APPLICATION_JSON).content(json));
 	}
+
+	//
+	// Helper Object
+	//
+
+	private final static MultipleGameResults results = new MultipleGameResults(0, 0, null);
 }

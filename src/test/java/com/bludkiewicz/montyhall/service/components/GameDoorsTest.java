@@ -1,4 +1,4 @@
-package com.bludkiewicz.montyhall.service.state;
+package com.bludkiewicz.montyhall.service.components;
 
 import com.bludkiewicz.montyhall.service.enums.Door;
 import org.junit.jupiter.api.Test;

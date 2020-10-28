@@ -1,11 +1,20 @@
-package com.bludkiewicz.montyhall.service.state;
+package com.bludkiewicz.montyhall.service.components;
 
 import com.bludkiewicz.montyhall.service.enums.Door;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Bean that contains game state.
+ *
+ * Each new simulation should receive a fresh copy of this.
+ */
+@Component
+@Scope("prototype")
 public class GameDoors {
 
 	private final List<Door> doors;
@@ -44,7 +53,7 @@ public class GameDoors {
 	}
 
 	/**
-	 * Get possible door options.  At the moment this is a static value.
+	 * Get possible door options.
 	 */
 	public List<Door> getPossibleDoorOptions() {
 

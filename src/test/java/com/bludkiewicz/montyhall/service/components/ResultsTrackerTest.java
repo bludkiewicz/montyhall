@@ -1,27 +1,30 @@
-package com.bludkiewicz.montyhall.service.results;
+package com.bludkiewicz.montyhall.service.components;
 
 import com.bludkiewicz.montyhall.service.enums.Door;
+import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
+import com.bludkiewicz.montyhall.service.results.SingleGameResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MultipleGameResultsTest {
+public class ResultsTrackerTest {
 
 	@Test
 	public void testBigWinner() {
 
 		// prepare
-		MultipleGameResults results = new MultipleGameResults();
-		results.addResult(winner);
+		ResultsTracker generator = new ResultsTracker();
+		generator.addResult(winner);
 
-		// verify win percentage
-		assertEquals(100d, results.getWinPercentage());
+		MultipleGameResults results = generator.getMultipleGameResults();
 
-		// verify results
+		// verify wins and attempts
+		assertEquals(1, results.getWins());
 		assertEquals(1, results.getAttempts());
 
+		// verify results
 		List<SingleGameResult> singleResults = results.getSingleResults();
 		assertEquals(winner, singleResults.get(0));
 	}
@@ -30,18 +33,19 @@ public class MultipleGameResultsTest {
 	public void testBreakEven() {
 
 		// prepare
-		MultipleGameResults results = new MultipleGameResults();
-		results.addResult(winner);
-		results.addResult(loser);
-		results.addResult(winner);
-		results.addResult(loser);
+		ResultsTracker generator = new ResultsTracker();
+		generator.addResult(winner);
+		generator.addResult(loser);
+		generator.addResult(winner);
+		generator.addResult(loser);
 
-		// verify win percentage
-		assertEquals(50d, results.getWinPercentage());
+		MultipleGameResults results = generator.getMultipleGameResults();
 
-		// verify results
+		// verify wins and attempts
+		assertEquals(2, results.getWins());
 		assertEquals(4, results.getAttempts());
 
+		// verify results
 		List<SingleGameResult> singleResults = results.getSingleResults();
 		assertEquals(winner, singleResults.get(0));
 		assertEquals(loser, singleResults.get(1));
@@ -53,19 +57,20 @@ public class MultipleGameResultsTest {
 	public void testBadNightOut() {
 
 		// prepare
-		MultipleGameResults results = new MultipleGameResults();
-		results.addResult(loser);
-		results.addResult(loser);
-		results.addResult(loser);
-		results.addResult(loser);
-		results.addResult(loser);
+		ResultsTracker generator = new ResultsTracker();
+		generator.addResult(loser);
+		generator.addResult(loser);
+		generator.addResult(loser);
+		generator.addResult(loser);
+		generator.addResult(loser);
 
-		// verify win percentage
-		assertEquals(0d, results.getWinPercentage());
+		MultipleGameResults results = generator.getMultipleGameResults();
 
-		// verify results
+		// verify wins and attempts
+		assertEquals(0, results.getWins());
 		assertEquals(5, results.getAttempts());
 
+		// verify results
 		List<SingleGameResult> singleResults = results.getSingleResults();
 		assertEquals(loser, singleResults.get(0));
 		assertEquals(loser, singleResults.get(1));
