@@ -6,7 +6,7 @@ public enum Prize {
 
 	private final String value;
 
-	Prize(String value ) {
+	Prize(String value) {
 		this.value = value;
 	}
 

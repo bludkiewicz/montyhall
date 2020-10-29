@@ -2,6 +2,7 @@ package com.bludkiewicz.montyhall.service;
 
 import com.bludkiewicz.montyhall.service.components.ResultsTracker;
 import com.bludkiewicz.montyhall.service.enums.Door;
+import com.bludkiewicz.montyhall.service.enums.Prize;
 import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
 import com.bludkiewicz.montyhall.service.results.SingleGameResult;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ public class FormattingServiceTest {
 		assertEquals(FormattingService.HEADERS, service.getSingleGameResultsHeaders());
 
 		// verify single game results are correct
-		assertEquals("        1  \uD83D\uDE97     \uD83D\uDC10     \uD83D\uDC10             1        2  false", service.getSingleGameResults(0, resultOne));
-		assertEquals("        2  \uD83D\uDC10     \uD83D\uDE97     \uD83D\uDC10             1        3  false", service.getSingleGameResults(1, resultTwo));
-		assertEquals("        3  \uD83D\uDC10     \uD83D\uDC10     \uD83D\uDE97             2        3   true", service.getSingleGameResults(2, resultThree));
+		assertEquals("        1  " + Prize.CAR + "     " + Prize.GOAT + "     " + Prize.GOAT + "             1        2  false", service.getSingleGameResults(0, resultOne));
+		assertEquals("        2  " + Prize.GOAT + "     " + Prize.CAR + "     " + Prize.GOAT + "             1        3  false", service.getSingleGameResults(1, resultTwo));
+		assertEquals("        3  " + Prize.GOAT + "     " + Prize.GOAT + "     " + Prize.CAR + "             2        3   true", service.getSingleGameResults(2, resultThree));
 	}
 }

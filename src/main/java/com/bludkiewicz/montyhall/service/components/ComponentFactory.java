@@ -11,7 +11,7 @@ public class ComponentFactory {
 
 	private final ApplicationContext context;
 
-	public ComponentFactory( ApplicationContext context ) {
+	public ComponentFactory(ApplicationContext context) {
 		this.context = context;
 	}
 

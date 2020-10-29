@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service that formats results to be displayed as a String.
+ * Service that formats results to be displayed as a fixed width String.
  */
 @Service
 public class FormattingService {

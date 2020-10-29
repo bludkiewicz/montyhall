@@ -41,7 +41,7 @@ public class GameDoorsTest {
 			});
 
 			// keep track of which door had the car
-			if(!carDoors.isEmpty()) carDoors.remove(doorWithCar);
+			if (!carDoors.isEmpty()) carDoors.remove(doorWithCar);
 		}
 
 		// verify all possible doors had a car behind them at least once

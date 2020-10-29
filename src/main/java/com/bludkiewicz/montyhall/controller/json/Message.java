@@ -1,5 +1,8 @@
 package com.bludkiewicz.montyhall.controller.json;
 
+/**
+ * Represents message-based response.
+ */
 public class Message {
 
 	private String message;

@@ -2,9 +2,9 @@ package com.bludkiewicz.montyhall.service;
 
 import com.bludkiewicz.montyhall.service.components.ComponentFactory;
 import com.bludkiewicz.montyhall.service.components.GameDoors;
-import com.bludkiewicz.montyhall.service.params.GameOptions;
 import com.bludkiewicz.montyhall.service.components.ResultsTracker;
 import com.bludkiewicz.montyhall.service.enums.Door;
+import com.bludkiewicz.montyhall.service.params.GameOptions;
 import com.bludkiewicz.montyhall.service.results.MultipleGameResults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,14 +48,14 @@ public class GameServiceTest {
 		results.getSingleResults().forEach(result -> {
 			// verify door was switched
 			assertNotSame(result.getOriginalChoice(), result.getSelectedChoice());
-			if(!originalSelections.isEmpty()) originalSelections.remove(result.getOriginalChoice());
+			if (!originalSelections.isEmpty()) originalSelections.remove(result.getOriginalChoice());
 		});
 
 		// randomness check
 		assertEquals(0, originalSelections.size());
 
 		// verify components were created correct number of times
-		verifyMocks(1, 100);
+		verifyMocks(1, iterations);
 	}
 
 	@Test
@@ -68,12 +68,12 @@ public class GameServiceTest {
 		assertEquals(iterations, results.getAttempts());
 
 		results.getSingleResults().forEach(result ->
-			// verify door was not switched
-			assertSame(result.getOriginalChoice(), result.getSelectedChoice())
+				// verify door was not switched
+				assertSame(result.getOriginalChoice(), result.getSelectedChoice())
 		);
 
 		// verify components were created correct number of times
-		verifyMocks(1, 100);
+		verifyMocks(1, iterations);
 	}
 
 	private void verifyMocks(int tracker, int doors) {

@@ -169,7 +169,7 @@ public class GameControllerTest {
 
 	private void verifyMocks(int simulate) {
 
-		// verify validation worked
+		// verify service access
 		verify(gameMock, times(simulate)).simulate(anyInt(), any());
 		verify(responseMock, times(simulate)).processResults(any());
 	}
