@@ -1,9 +1,12 @@
 package com.bludkiewicz.montyhall.mvc.controller;
 
 import com.bludkiewicz.montyhall.core.service.GameService;
+import com.bludkiewicz.montyhall.core.service.enums.Door;
 import com.bludkiewicz.montyhall.core.service.params.GameOptions;
 import com.bludkiewicz.montyhall.core.service.results.MultipleGameResults;
-import com.bludkiewicz.montyhall.mvc.service.ResponseService;
+import com.bludkiewicz.montyhall.core.service.results.SingleGameResult;
+import com.bludkiewicz.montyhall.mvc.service.OutputService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,7 +38,10 @@ public class GameControllerTest {
 	private GameService gameMock;
 
 	@MockBean
-	private ResponseService responseMock;
+	private OutputService outputMock;
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	@BeforeEach
 	public void setupMock() {
@@ -42,7 +49,7 @@ public class GameControllerTest {
 		// this method may or may not be called
 		// depending on whether validation may or may not have passed
 		lenient().when(gameMock.simulate(anyInt(), any())).thenReturn(results);
-		lenient().when(responseMock.processResults(results)).thenReturn(null);
+		lenient().doNothing().when(outputMock).processResults(results);
 	}
 
 	//
@@ -55,13 +62,16 @@ public class GameControllerTest {
 		// get is not allowed with json content
 		mockMvc.perform(get("/api/play/").contentType(MediaType.APPLICATION_JSON).content("{}"))
 				.andExpect(status().isMethodNotAllowed())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 
 		// get is allowed with path variables
 		getWithPathVariables("1", "true")
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(content().json(mapper.writeValueAsString(results)));
 
 		verifyMocks(1);
 	}
@@ -72,13 +82,16 @@ public class GameControllerTest {
 		// post is not allowed with path variables
 		mockMvc.perform(post("/api/play/1/true"))
 				.andExpect(status().isMethodNotAllowed())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.message").exists());
 
 		verifyMocks(0);
 
 		// post is allowed with json content
 		postWithJSON("1", "true")
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(content().json(mapper.writeValueAsString(results)));
 
 		verifyMocks(1);
 	}
@@ -131,19 +144,23 @@ public class GameControllerTest {
 
 		// test get request with path variables
 		getWithPathVariables("1000", "false")
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(content().json(mapper.writeValueAsString(results)));
 
 		// verifies that service received correct parameters
 		verify(gameMock, times(1)).simulate(1000, new GameOptions(false));
-		verify(responseMock, times(1)).processResults(results);
+		verify(outputMock, times(1)).processResults(results);
 
 		// test post request with json content
 		postWithJSON("1", "true")
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(content().json(mapper.writeValueAsString(results)));
 
 		// verifies that service received correct parameters
 		verify(gameMock, times(1)).simulate(1, new GameOptions(true));
-		verify(responseMock, times(2)).processResults(results);
+		verify(outputMock, times(2)).processResults(results);
 	}
 
 	//
@@ -171,7 +188,7 @@ public class GameControllerTest {
 
 		// verify service access
 		verify(gameMock, times(simulate)).simulate(anyInt(), any());
-		verify(responseMock, times(simulate)).processResults(any());
+		verify(outputMock, times(simulate)).processResults(any());
 	}
 
 	private ResultActions getWithPathVariables(String iterations, String switchDoor) throws Exception {
@@ -196,5 +213,6 @@ public class GameControllerTest {
 	// Helper Object
 	//
 
-	private final static MultipleGameResults results = new MultipleGameResults(0, 0, null);
+	private final static MultipleGameResults results =
+			new MultipleGameResults(0, 1, List.of(new SingleGameResult(Door.ONE, Door.TWO, Door.TWO)));
 }

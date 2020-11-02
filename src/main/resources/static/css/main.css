@@ -1,0 +1,11 @@
+.dataTables_length {
+    padding-top: 0.85em;
+}
+
+.dataTables_paginate {
+    padding-top: 0.4em;
+}
+
+#results, #results_wrapper, #win {
+    display: none;
+}

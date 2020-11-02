@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +32,10 @@ public class GameServiceTest {
 	@BeforeEach
 	public void setup() {
 		lenient().when(factory.getGameDoors()).thenReturn(new GameDoors());
-		lenient().when(factory.getResultsTracker()).thenReturn(new ResultsTracker());
+
+		ResultsTracker tracker = new ResultsTracker();
+		ReflectionTestUtils.setField(tracker, "maxResults", 1000);
+		lenient().when(factory.getResultsTracker()).thenReturn(tracker);
 	}
 
 	@Test

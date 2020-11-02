@@ -4,8 +4,7 @@ import com.bludkiewicz.montyhall.core.service.GameService;
 import com.bludkiewicz.montyhall.core.service.params.GameOptions;
 import com.bludkiewicz.montyhall.core.service.results.MultipleGameResults;
 import com.bludkiewicz.montyhall.mvc.controller.json.GameParams;
-import com.bludkiewicz.montyhall.mvc.controller.json.Response;
-import com.bludkiewicz.montyhall.mvc.service.ResponseService;
+import com.bludkiewicz.montyhall.mvc.service.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -21,11 +20,11 @@ public class GameController {
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 
 	private final GameService gameService;
-	private final ResponseService responseService;
+	private final OutputService outputService;
 
-	public GameController(GameService gameService, ResponseService responseService) {
+	public GameController(GameService gameService, OutputService outputService) {
 		this.gameService = gameService;
-		this.responseService = responseService;
+		this.outputService = outputService;
 	}
 
 	/**
@@ -36,8 +35,8 @@ public class GameController {
 	 * but I do not know of a way to map both @PathVariables and @JsonProperties to the same class.
 	 */
 	@GetMapping("/api/play/{iterations}/{switch}")
-	public Response play(@Valid @Positive @PathVariable Integer iterations,
-						 @PathVariable("switch") Boolean switchDoors) {
+	public MultipleGameResults play(@Valid @Positive @PathVariable Integer iterations,
+									@PathVariable("switch") Boolean switchDoors) {
 
 		log.debug("PathVariables Received: {}, {}", iterations, switchDoors);
 
@@ -49,7 +48,7 @@ public class GameController {
 	 * Parameters are validated and violations are handled in ControllerExceptionHandler.
 	 */
 	@PostMapping("/api/play/")
-	public Response play(@Valid @RequestBody GameParams params) {
+	public MultipleGameResults play(@Valid @RequestBody GameParams params) {
 
 		log.debug("RequestBody Received: {}", params);
 
@@ -59,10 +58,11 @@ public class GameController {
 	/**
 	 * No matter how the request is received, the game is played the same.
 	 */
-	private Response playTheGame(int iterations, boolean switchDoors) {
-		MultipleGameResults results =
-				gameService.simulate(iterations, new GameOptions(switchDoors));
+	private MultipleGameResults playTheGame(int iterations, boolean switchDoors) {
 
-		return responseService.processResults(results);
+		MultipleGameResults results = gameService.simulate(iterations, new GameOptions(switchDoors));
+		outputService.processResults(results);
+
+		return results;
 	}
 }

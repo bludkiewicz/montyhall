@@ -4,18 +4,22 @@ import com.bludkiewicz.montyhall.core.service.enums.Door;
 import com.bludkiewicz.montyhall.core.service.results.MultipleGameResults;
 import com.bludkiewicz.montyhall.core.service.results.SingleGameResult;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ResultsTrackerTest {
 
 	@Test
-	public void testBigWinner() {
+	public void testBigWinnerAtMaxResults() {
 
 		// prepare
 		ResultsTracker generator = new ResultsTracker();
+		ReflectionTestUtils.setField(generator, "maxResults", 1);
+
 		generator.addResult(winner);
 
 		MultipleGameResults results = generator.getMultipleGameResults();
@@ -30,10 +34,12 @@ public class ResultsTrackerTest {
 	}
 
 	@Test
-	public void testBreakEven() {
+	public void testBreakEvenUnderMaxResults() {
 
 		// prepare
 		ResultsTracker generator = new ResultsTracker();
+		ReflectionTestUtils.setField(generator, "maxResults", 5);
+
 		generator.addResult(winner);
 		generator.addResult(loser);
 		generator.addResult(winner);
@@ -54,10 +60,12 @@ public class ResultsTrackerTest {
 	}
 
 	@Test
-	public void testBadNightOut() {
+	public void testBadNightOutOverMaxResults() {
 
 		// prepare
 		ResultsTracker generator = new ResultsTracker();
+		ReflectionTestUtils.setField(generator, "maxResults", 4);
+
 		generator.addResult(loser);
 		generator.addResult(loser);
 		generator.addResult(loser);
@@ -72,12 +80,12 @@ public class ResultsTrackerTest {
 
 		// verify results
 		List<SingleGameResult> singleResults = results.getSingleResults();
-		assertEquals(loser, singleResults.get(0));
-		assertEquals(loser, singleResults.get(1));
-		assertEquals(loser, singleResults.get(2));
-		assertEquals(loser, singleResults.get(3));
-		assertEquals(loser, singleResults.get(4));
+		assertTrue(singleResults.isEmpty());
 	}
+
+	//
+	// Helper Objects
+	//
 
 	private final static SingleGameResult winner = new SingleGameResult(Door.ONE, Door.TWO, Door.ONE);
 	private final static SingleGameResult loser = new SingleGameResult(Door.ONE, Door.TWO, Door.THREE);
