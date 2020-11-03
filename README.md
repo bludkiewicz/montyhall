@@ -36,10 +36,10 @@ Both endpoints return a JSON response:<br>
     }]
 }`
 
-$(wins) and $(attempts) are integer values of the total number of wins and attempts.<br>
-$(door) is a string value of whether a car or goat was behind a door.<br>
-$(choice) is an integer value of a door number.<br>
-$(result) is a boolean value of whether the game was won or lost.<br>
+$(wins) and $(attempts) are integer values of the total number of wins and attempts for the request.<br>
+$(door) is a string value of whether a car or goat was behind a door for each individual attempt.<br>
+$(choice) is an integer value of a door number for each individual attempt.<br>
+$(result) is a boolean value of whether the game was won or lost for each individual attempt.<br>
 
 This application also logs the output using a fixed width format on info, and it uses emojis to show results.
 Please be aware that your runtime environment will need emoji support to display logs successfully.
@@ -49,7 +49,7 @@ That can be set in application.properties as output.max_results_to_show.  If not
 The JSON response will contain an empty results array if this limit is reached.
 Otherwise, it will have an entry for each attempt.
 
-A front end UI is also included in this application.  It can be reached at the context root:
+A sample front end UI is also included in this application.  It can be reached at the context root:
 
 GET /
 
