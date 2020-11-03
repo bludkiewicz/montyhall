@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
- * Object representation of JSON properties.
+ * Object representation of JSON input parameters.
  * Configured to integrate with Bean Validation API.
  */
 public class GameParams {

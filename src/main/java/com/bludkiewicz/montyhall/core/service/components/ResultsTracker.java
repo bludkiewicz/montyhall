@@ -20,7 +20,7 @@ import java.util.List;
 public class ResultsTracker {
 
 	// using linked list to avoid array resizing
-	// since results are always added at tail
+	// also results are always added at tail and there is no index based retrieval
 	private final List<SingleGameResult> results = new LinkedList<>();
 	private int wins;
 
@@ -39,10 +39,8 @@ public class ResultsTracker {
 	public MultipleGameResults getMultipleGameResults() {
 
 		List<SingleGameResult> singleResults;
-		if (results.size() <= maxResults)
-			singleResults = new ArrayList<>(results);
-		else
-			singleResults = Collections.emptyList();
+		if (results.size() <= maxResults) singleResults = new ArrayList<>(results);
+		else singleResults = Collections.emptyList();
 
 		return new MultipleGameResults(wins, results.size(), singleResults);
 	}

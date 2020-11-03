@@ -43,9 +43,8 @@ public class GameDoors {
 	 */
 	public Door getOpenedDoor(Door selectedDoor) {
 
-		// if the 0 element is always the car
-		// that means the 1 and 2 elements are the goats
-		// we need to know which door was selected so we don't return that one
+		// if the first door is always the car
+		// that means the other two are always goats
 		Door opened = doors.get(1);
 		if (opened == selectedDoor) opened = doors.get(2);
 

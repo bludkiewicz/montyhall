@@ -36,13 +36,18 @@ Both endpoints return a JSON response:<br>
     }]
 }`
 
-$(wins), $(attempts), $(choice) are integer values.<br/>
-$(door) is a string value.<br>
-$(result) is a boolean value.
+$(wins) and $(attempts) are integer values of the total number of wins and attempts.<br>
+$(door) is a string value of whether a car or goat was behind a door.<br>
+$(choice) is an integer value of a door number.<br>
+$(result) is a boolean value of whether the game was won or lost.<br>
+
+This application also logs the output using a fixed width format on info, and it uses emojis to show results.
+Please be aware that your runtime environment will need emoji support to display logs successfully.
 
 As there can be Integer.MAX_VALUE iterations, you may not want to show individual results after a certain threshold.
 That can be set in application.properties as output.max_results_to_show.  If not set it will default to 1000.
 The JSON response will contain an empty results array if this limit is reached.
+Otherwise, it will have an entry for each attempt.
 
 A front end UI is also included in this application.  It can be reached at the context root:
 
@@ -57,6 +62,3 @@ To run the application:
 `java -jar montyhall.jar`
 
 JaCoCo is used to verify test code coverage.
-
-This application logs the output on info, and it uses emojis to show results.
-Please be aware that your runtime environment will need emoji support to display properly.
